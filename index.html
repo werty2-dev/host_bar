@@ -58,6 +58,22 @@
     background:linear-gradient(180deg, rgba(27,27,31,0.18) 0%, rgba(27,27,31,0.72) 76%, rgba(27,27,31,0.96) 100%);
   }
 
+  /* night mood for the "today" panel — real daytime photo, pushed toward
+     night with color/brightness + a few warm light speckles (no genuine
+     night photo of Baranavichy is freely licensed) */
+  .panel[data-key="s12"] .bg{
+    filter:saturate(0.55) brightness(0.3) contrast(1.25) hue-rotate(200deg);
+  }
+  .panel[data-key="s12"] .bg::after{
+    background:
+      radial-gradient(2.5px 2.5px at 18% 28%, rgba(255,206,120,0.95) 0%, transparent 60%),
+      radial-gradient(2px 2px at 62% 42%, rgba(255,206,120,0.75) 0%, transparent 60%),
+      radial-gradient(2.5px 2.5px at 82% 22%, rgba(255,206,120,0.85) 0%, transparent 60%),
+      radial-gradient(2px 2px at 38% 62%, rgba(255,206,120,0.6) 0%, transparent 60%),
+      radial-gradient(2px 2px at 74% 68%, rgba(255,206,120,0.55) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(10,14,30,0.35) 0%, rgba(10,14,30,0.82) 76%, rgba(10,14,30,0.97) 100%);
+  }
+
   .panel-inner{
     position:relative; z-index:2; height:100%;
     display:flex; align-items:center;
@@ -363,23 +379,23 @@
       <h2>Тры пункты на карце горада</h2>
       <p>Асновы гарадскога аблічча — храмы, музеі і вуліцы, якія памятаюць розныя эпохі.</p>
       <div class="wheel-row">
-        <div class="wheel-viewport" id="wheelViewport">
-          <div class="wheel-disc" id="wheelDisc">
-            <div class="wheel-node active" data-idx="0">
+        <div class="wheel-viewport">
+          <div class="wheel-disc">
+            <div class="wheel-node active" data-idx="0" data-title="Свята-Пакроўскі сабор" data-desc="Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.">
               <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi%2C%20Belarus%20-%20panoramio%20%2811%29.jpg?width=300" alt=""></div>
             </div>
-            <div class="wheel-node" data-idx="1">
+            <div class="wheel-node" data-idx="1" data-title="Чыгуначная спадчына" data-desc="Помнік-паравоз і музейныя экспазіцыі нагадваюць, з чаго пачаўся горад — са станцыі і рэек.">
               <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2021.12.06%20Baranavi%C4%8Dy%20steam%20locomotive.jpg?width=300" alt=""></div>
             </div>
-            <div class="wheel-node" data-idx="2">
+            <div class="wheel-node" data-idx="2" data-title="Цэнтральныя вуліцы" data-desc="Забудова розных эпох — ад міжваеннай да сучаснай — суіснуе на галоўных праспектах горада.">
               <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Baranavi%C4%8Dy%20Montage%20%282017%29.jpg?width=300" alt=""></div>
             </div>
             <div class="wheel-hub"></div>
           </div>
         </div>
-        <div class="wheel-text" id="wheelText">
-          <h3 id="wheelTitle">Свята-Пакроўскі сабор</h3>
-          <p id="wheelDesc">Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.</p>
+        <div class="wheel-text">
+          <h3 class="wheel-title">Свята-Пакроўскі сабор</h3>
+          <p class="wheel-desc">Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.</p>
         </div>
       </div>
     </div>
@@ -402,14 +418,157 @@
   </div>
 </section>
 
-<section class="panel" data-key="footer" data-length="130">
+<section class="panel" data-key="s5" data-length="150">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/2021.12.06%20Baranavi%C4%8Dy%20steam%20locomotive.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="right">
+      <span class="kicker">СІМВАЛ ГОРАДА</span>
+      <h2>Герб Баранавіч</h2>
+      <p>На гербе горада — паравоз і зубчатае кола: два сімвалы адной гісторыі. Паравоз нагадвае пра чыгуначныя карані Баранавіч, зубчатае кола сімвалізуе працу, прамысловасць і развіццё. Чыгунка → развіццё → горад.</p>
+      <div class="meta-row">
+        <div><span class="num">🚂</span><span class="lbl">паравоз — чыгуначная гісторыя</span></div>
+        <div><span class="num">⚙️</span><span class="lbl">зубчатае кола — прамысловасць</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s6" data-length="140">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Дом%20в%20центре%20-%20panoramio.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="left">
+      <span class="kicker">ЖЫХАРЫ</span>
+      <h2>Як называюць жыхароў Баранавіч?</h2>
+      <p>Баранавічы — гэта перш за ўсё людзі. Жыхара горада называюць баранавічанінам, жыхарку — баранавічанкай, а ўсіх разам — баранавічанамі.</p>
+      <div class="meta-row">
+        <div><span class="num">👨</span><span class="lbl">баранавічанін</span></div>
+        <div><span class="num">👩</span><span class="lbl">баранавічанка</span></div>
+        <div><span class="num">👥</span><span class="lbl">баранавічане</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s7" data-length="140">
+  <div class="bg" style="background-image:url('https://nashkraj.by/upload/iblock/dd5/10wh2372pc8qhr4tlqo4hl4582ak0la3.jpg')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="right">
+      <span class="kicker">ЛЮДЗІ</span>
+      <h2>Таленты з Баранавіч</h2>
+      <p>nkeeei (сапраўднае імя — Нікіта Коробыка) — беларускі хіп-хоп-выканаўца і аўтар песень, які нарадзіўся ў Баранавічах 3 студзеня 2001 года. Сёння ён — адзін з прадстаўнікоў новай хвалі беларускага хіп-хопу.</p>
+      <div class="meta-row">
+        <div><span class="num">🎤</span><span class="lbl">nkeeei — Нікіта Коробыка</span></div>
+        <div><span class="num">2001</span><span class="lbl">год нараджэння</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s8" data-length="160">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranavichy%20vechny%20ahon.JPG?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="left">
+      <span class="kicker">ГІСТОРЫЯ, ЯКОЙ НЕЛЬГА ЗАБЫЦЬ</span>
+      <h2>Андрэй Нічыпорчык і Мікіта Куканенка</h2>
+      <p>19 мая 2021 года падчас вучэбнага палёту над Баранавічамі ў самалёта адбылася тэхнічная няспраўнасць. Лётчыкі адвялі машыну ад жылых кварталаў горада, але самі загінулі. Абодва пасмяротна ўзнагароджаны званнем Героя Беларусі. Пра іх подзвіг зняты фільм «Адно на дваіх».</p>
+      <div class="meta-row">
+        <div><span class="num">19.05</span><span class="lbl">2021 года</span></div>
+        <div><span class="num">🎬</span><span class="lbl">«Адно на дваіх»</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s9" data-length="140">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Wa%C5%84kowicz%20Adam%20Mickiewicz.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="right">
+      <span class="kicker">ВЯЛІКІЯ ІМЁНЫ</span>
+      <h2>Адам Міцкевіч і Баранавіцкі край</h2>
+      <p>Адзін з самых вядомых паэтаў XIX стагоддзя звязаны з нашым краем: у 1798 годзе ён нарадзіўся ў Завоссі — мясцовасці, якая сёння знаходзіцца на тэрыторыі Баранавіцкага раёна. Адам Міцкевіч — частка гісторыка-культурнай спадчыны Баранавіцкага краю.</p>
+      <div class="meta-row">
+        <div><span class="num">1798</span><span class="lbl">нарадзіўся ў Завоссі</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s10" data-length="170">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Вид%20на%20центральную%20улицу%20-%20panoramio.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="scale" style="max-width:1100px;">
+      <span class="kicker">ГОЛАС ГОРАДА</span>
+      <h2>«Наш край» — мясцовая газета</h2>
+      <p>Горад захоўвае памяць праз гісторыі сваіх людзей — нумар за нумарам.</p>
+      <div class="wheel-row">
+        <div class="wheel-viewport">
+          <div class="wheel-disc">
+            <div class="wheel-node active" data-idx="0" data-title="Жыццё горада" data-desc="«Наш край» расказвае пра паўсядзённае жыццё Баранавіч і яго людзей.">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/A%20stack%20of%20newspapers.jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-node" data-idx="1" data-title="Гісторыі людзей" data-desc="Кожны нумар — гэта гісторыі жыхароў горада і іх лёсы.">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Newspaper%20stack.jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-node" data-idx="2" data-title="Гісторыя краю" data-desc="Газета захоўвае памяць пра важныя падзеі, культуру і гісторыю Баранавіцкага краю.">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Newspapers%20(AM%20614133-10).jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-hub"></div>
+          </div>
+        </div>
+        <div class="wheel-text">
+          <h3 class="wheel-title">Жыццё горада</h3>
+          <p class="wheel-desc">«Наш край» расказвае пра паўсядзённае жыццё Баранавіч і яго людзей.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s11" data-length="140">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/P%C3%B8lse%20i%20vaffel%2001.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="right">
+      <span class="kicker">СМАК БАРАНАВІЧ</span>
+      <h2>Лодачкі 🍴</h2>
+      <p>Лодачкі — адна з самых вядомых мясцовых страў, якая асацыюецца менавіта з Баранавічамі. Простая і любімая ежа, што стала гастранамічнай візітнай карткай горада: мясцовая традыцыя і любімы смак у адным.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s12" data-length="150">
+  <div class="bg" style="background-image:url('https://nashkraj.by/upload/iblock/570/57028d10514ee0264128089b4b439f65.jpg')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="up">
+      <span class="kicker">СЁННЯ</span>
+      <h2>Горад, які расце і змяняецца</h2>
+      <p>Баранавічы захоўваюць сваю гісторыю і адначасова становяцца сучасным горадам. Усё гэта стварае непаўторны характар Баранавіч.</p>
+      <div class="meta-row">
+        <div><span class="num">🚂</span><span class="lbl">чыгунка</span></div>
+        <div><span class="num">🏛️</span><span class="lbl">гісторыя</span></div>
+        <div><span class="num">🎭</span><span class="lbl">культура</span></div>
+        <div><span class="num">👥</span><span class="lbl">людзі</span></div>
+        <div><span class="num">🌆</span><span class="lbl">сучаснае жыццё</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="footer" data-length="220">
   <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranavichy01.jpg?width=1600')"></div>
   <div class="idx"></div>
   <div class="panel-inner">
     <div class="content" data-variant="up">
       <span class="kicker">ЗАКЛЮЧЭННЕ</span>
       <h2>Горад, які варта пабачыць</h2>
-      <p>Баранавічы — гэта гісторыя пра тое, як чыгунка можа стварыць горад, а горад — захаваць памяць пра ўсе дарогі, што праз яго прайшлі. Дзякуй за ўвагу.</p>
+      <p>Баранавічы — гэта не проста горад. Гэта мая малая радзіма. Тут пачынаецца мая гісторыя: чыгунка можа стварыць горад, а горад — захаваць памяць пра ўсе дарогі, што праз яго прайшлі. Мой горад. Мой край. Мая малая радзіма. ❤️</p>
       <div class="foot-meta">
         <span>Спасибо большое за терпение</span>
         <span>Egor daun</span>
@@ -491,29 +650,36 @@
   }
   function lerp(a, b, t){ return a + (b - a) * t; }
 
-  var sightsData = [
-    { title:'Свята-Пакроўскі сабор', desc:'Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.' },
-    { title:'Чыгуначная спадчына', desc:'Помнік-паравоз і музейныя экспазіцыі нагадваюць, з чаго пачаўся горад — са станцыі і рэек.' },
-    { title:'Цэнтральныя вуліцы', desc:'Забудова розных эпох — ад міжваеннай да сучаснай — суіснуе на галоўных праспектах горада.' }
-  ];
-  var wheelViewport = document.getElementById('wheelViewport');
-  var wheelDisc = document.getElementById('wheelDisc');
-  var wheelNodes = wheelDisc ? Array.prototype.slice.call(wheelDisc.querySelectorAll('.wheel-node')) : [];
-  var wheelNodeSpins = wheelDisc ? Array.prototype.slice.call(wheelDisc.querySelectorAll('.wheel-node-spin')) : [];
-  var wheelTitleEl = document.getElementById('wheelTitle');
-  var wheelDescEl = document.getElementById('wheelDesc');
-  var wheelTextEl = document.getElementById('wheelText');
-  var wheelIdx = 0;
+  // generalized rotating carousel ("wheel") support — any panel can host one
+  // by including a .wheel-viewport with .wheel-node children carrying
+  // data-title / data-desc attributes.
+  var wheels = panels.map(function(p){
+    var viewport = p.querySelector('.wheel-viewport');
+    if(!viewport) return null;
+    var disc = viewport.querySelector('.wheel-disc');
+    var nodes = disc ? Array.prototype.slice.call(disc.querySelectorAll('.wheel-node')) : [];
+    var nodeSpins = disc ? Array.prototype.slice.call(disc.querySelectorAll('.wheel-node-spin')) : [];
+    var w = {
+      panel: p, viewport: viewport, disc: disc, nodes: nodes, nodeSpins: nodeSpins,
+      textEl: p.querySelector('.wheel-text'),
+      titleEl: p.querySelector('.wheel-title'),
+      descEl: p.querySelector('.wheel-desc'),
+      idx: 0
+    };
+    p._wheel = w;
+    return w;
+  }).filter(Boolean);
 
-  function setWheelIdx(i){
-    wheelIdx = i;
-    wheelNodes.forEach(function(n){ n.classList.toggle('active', +n.dataset.idx === i); });
-    if(!wheelTextEl) return;
-    wheelTextEl.classList.add('fade');
+  function setWheelIdx(w, i){
+    w.idx = i;
+    w.nodes.forEach(function(n){ n.classList.toggle('active', +n.dataset.idx === i); });
+    var active = w.nodes[i];
+    if(!w.textEl || !active) return;
+    w.textEl.classList.add('fade');
     setTimeout(function(){
-      wheelTitleEl.textContent = sightsData[i].title;
-      wheelDescEl.textContent = sightsData[i].desc;
-      wheelTextEl.classList.remove('fade');
+      if(w.titleEl) w.titleEl.textContent = active.dataset.title || '';
+      if(w.descEl) w.descEl.textContent = active.dataset.desc || '';
+      w.textEl.classList.remove('fade');
     }, 220);
   }
 
@@ -551,15 +717,17 @@
       p.style.opacity = opacity;
       p.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
 
-      if(p.dataset.key === 's3' && wheelViewport){
-        if(opacity > 0.35){ wheelViewport.classList.add('in'); } else { wheelViewport.classList.remove('in'); }
-        if(wheelDisc){
+      var wheel = p._wheel;
+      if(wheel){
+        if(opacity > 0.35){ wheel.viewport.classList.add('in'); } else { wheel.viewport.classList.remove('in'); }
+        if(wheel.disc && wheel.nodes.length){
           var wheelClamped = Math.min(1, Math.max(0, clamped));
           var rotDeg = reduced ? 0 : wheelClamped * 720;
-          wheelDisc.style.transform = 'rotate(' + rotDeg.toFixed(1) + 'deg)';
-          wheelNodeSpins.forEach(function(el){ el.style.transform = 'rotate(' + (-rotDeg).toFixed(1) + 'deg)'; });
-          var activeIdx = Math.floor((((rotDeg % 360) + 360) % 360) / 120);
-          if(activeIdx !== wheelIdx){ setWheelIdx(activeIdx); }
+          wheel.disc.style.transform = 'rotate(' + rotDeg.toFixed(1) + 'deg)';
+          wheel.nodeSpins.forEach(function(el){ el.style.transform = 'rotate(' + (-rotDeg).toFixed(1) + 'deg)'; });
+          var step = 360 / wheel.nodes.length;
+          var activeIdx = Math.floor((((rotDeg % 360) + 360) % 360) / step);
+          if(activeIdx !== wheel.idx){ setWheelIdx(wheel, activeIdx); }
         }
       }
 
