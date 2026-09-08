@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="be">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Баранавічы — горад на скрыжаванні дарог</title>
+<style>
+  :root{
+    --ink:#1B1B1F;
+    --paper:#EDE6D8;
+    --amber:#E0A458;
+    --brick:#8C3B2E;
+    --paper-dim: rgba(237,230,216,0.62);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{ margin:0; background:var(--ink); }
+  body{
+    color:var(--paper);
+    font-family:'Iowan Old Style','Georgia','Noto Serif',serif;
+  }
+
+  h1,h2,h3,.display{
+    font-family:'Rockwell','Roboto Slab','Arial Black',sans-serif;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  p{
+    font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    line-height:1.65;
+    font-weight:400;
+  }
+  ::selection{ background:var(--amber); color:var(--ink); }
+
+  #spacer{ width:100%; pointer-events:none; }
+
+  .panel{
+    position:fixed; inset:0;
+    overflow:hidden;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .bg{
+    position:absolute;
+    inset:-8%;
+    background-size:cover;
+    background-position:center;
+    filter:saturate(0.9) brightness(0.5);
+    will-change:transform;
+  }
+  .bg::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(27,27,31,0.18) 0%, rgba(27,27,31,0.72) 76%, rgba(27,27,31,0.96) 100%);
+  }
+
+  .panel-inner{
+    position:relative; z-index:2; height:100%;
+    display:flex; align-items:center;
+    padding:calc(8vh + var(--safe-top)) 7vw calc(8vh + var(--safe-bottom));
+  }
+
+  .content{ max-width:760px; }
+  .content > *{ will-change:transform,opacity; }
+
+  .kicker{
+    display:inline-block;
+    font-family:-apple-system,sans-serif;
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--amber);
+    border-left:2px solid var(--amber);
+    padding-left:10px;
+    margin-bottom:16px;
+  }
+  .content h2{
+    font-size:clamp(30px,5.4vw,58px);
+    line-height:1.05;
+    margin-bottom:18px;
+  }
+  .content p{
+    font-size:clamp(14px,1.6vw,17.5px);
+    color:var(--paper-dim);
+    max-width:60ch;
+  }
+  .meta-row{
+    display:flex; gap:28px; margin-top:26px; flex-wrap:wrap;
+  }
+  .meta-row div{ font-family:-apple-system,sans-serif; }
+  .meta-row .num{ color:var(--amber); font-size:21px; font-weight:700; display:block; }
+  .meta-row .lbl{ color:var(--paper-dim); font-size:11.5px; letter-spacing:0.04em; }
+
+  /* hero */
+  .panel[data-key="hero"] .panel-inner{ align-items:flex-end; padding-bottom:calc(12vh + var(--safe-bottom)); }
+  .panel[data-key="hero"] .content{ max-width:900px; }
+  .display{
+    font-size:clamp(46px,12vw,140px);
+    line-height:0.86;
+    color:var(--paper);
+  }
+  .display span{ color:var(--amber); }
+  .sub{
+    font-family:-apple-system,sans-serif;
+    color:var(--paper-dim);
+    font-size:clamp(14px,2vw,18px);
+    margin-top:16px;
+    max-width:52ch;
+  }
+
+  .idx{
+    position:absolute; top:calc(8vh + var(--safe-top)); right:7vw; z-index:3;
+    font-family:-apple-system,sans-serif;
+    font-size:13px; color:var(--paper-dim); letter-spacing:0.1em;
+  }
+
+  /* dive / immersive text panel */
+  .panel[data-key="dive"] .bg{
+    filter:saturate(0.8) brightness(0.42) blur(1px);
+  }
+  .panel[data-key="dive"] .bg::after{
+    background:radial-gradient(circle at 50% 48%, rgba(27,27,31,0.25) 0%, rgba(27,27,31,0.8) 70%, rgba(27,27,31,0.96) 100%);
+  }
+  .dive-inner{
+    position:relative; z-index:2; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+  }
+  .dive-word{
+    font-family:'Rockwell','Roboto Slab','Arial Black',sans-serif;
+    font-weight:800;
+    font-size:clamp(34px,8vw,92px);
+    color:var(--amber);
+    letter-spacing:-0.01em;
+    white-space:nowrap;
+  }
+  .white-flash{
+    position:fixed; inset:0; background:var(--paper);
+    opacity:0; pointer-events:none; z-index:60;
+  }
+
+  /* sights wheel */
+  .wheel-row{
+    display:flex; align-items:center; gap:36px;
+    width:100%; max-width:1100px; margin-top:26px;
+  }
+  .wheel-viewport{
+    position:relative; flex:0 0 auto;
+    width:190px; height:380px; overflow:hidden;
+    opacity:0; transform:translateX(-46px);
+    transition:opacity .9s ease, transform .9s cubic-bezier(.22,1,.36,1);
+  }
+  .wheel-viewport.in{ opacity:1; transform:translateX(0); }
+  .wheel-disc{
+    position:absolute; left:-190px; top:0; width:380px; height:380px;
+    border-radius:50%;
+    border:1px dashed rgba(237,230,216,0.28);
+    will-change:transform;
+  }
+  .wheel-node{
+    position:absolute; top:50%; left:50%; width:82px; height:82px; margin:-41px;
+    border-radius:50%; overflow:hidden; opacity:.4;
+    border:2px solid rgba(224,164,88,0.45);
+    transition:opacity .45s ease, border-color .45s ease;
+  }
+  .wheel-node.active{ opacity:1; border-color:var(--amber); }
+  .wheel-node:nth-child(1){ transform:rotate(0deg) translate(136px) rotate(0deg); }
+  .wheel-node:nth-child(2){ transform:rotate(120deg) translate(136px) rotate(-120deg); }
+  .wheel-node:nth-child(3){ transform:rotate(240deg) translate(136px) rotate(-240deg); }
+  .wheel-node-spin{ width:100%; height:100%; will-change:transform; }
+  .wheel-node img{ width:100%; height:100%; object-fit:cover; display:block; filter:saturate(0.9); }
+  .wheel-hub{
+    position:absolute; top:50%; left:50%; width:14px; height:14px; margin:-7px;
+    border-radius:50%; background:var(--amber);
+  }
+
+  .wheel-text{ flex:1; min-width:0; transition:opacity .3s ease; }
+  .wheel-text.fade{ opacity:0; }
+  .wheel-text h3{ font-size:19px; margin-bottom:8px; color:var(--paper); }
+  .wheel-text p{ font-size:13.5px; color:var(--paper-dim); max-width:44ch; }
+
+  .foot-meta{
+    margin-top:36px; width:100%; max-width:640px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-family:-apple-system,sans-serif; font-size:11.5px; color:var(--paper-dim); letter-spacing:0.04em;
+    border-top:1px solid rgba(237,230,216,0.14); padding-top:16px;
+  }
+
+  .rail{ position:fixed; top:0; left:0; height:3px; width:100%; z-index:50; background:transparent; }
+  .rail-fill{ height:100%; width:0%; background:linear-gradient(90deg, var(--brick), var(--amber)); }
+
+  /* ===== loader ===== */
+  #loader{
+    position:fixed; inset:0; z-index:200;
+    background:#4A4E58;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .6s ease;
+  }
+  #loader.hide{ opacity:0; pointer-events:none; }
+  .loader-stage{
+    position:relative; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .loader-word{
+    display:flex; align-items:center; gap:12px;
+    opacity:0; transform:scale(0.92);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .loader-word.on{ opacity:1; transform:scale(1); }
+  .loader-word.off{ opacity:0; transform:scale(0.4); transition:opacity .5s ease, transform .5s ease; }
+  .tg-icon{ color:#D9A63E; display:flex; }
+  .loader-handle{
+    font-family:-apple-system,'Segoe UI',Arial,sans-serif;
+    font-weight:600;
+    font-size:clamp(20px,4.5vw,30px);
+    letter-spacing:0.01em;
+    display:flex;
+  }
+  .loader-handle .lt{
+    display:inline-block;
+    color:#D9A63E;
+    animation:swim 2.1s ease-in-out infinite;
+  }
+  @keyframes swim{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-7px); }
+  }
+  .drop{
+    position:absolute; left:50%; top:50%;
+    width:30px; height:30px;
+    background:#D9A63E;
+    border-radius:50% 50% 50% 0;
+    transform:translate(-50%,-50%) rotate(-45deg) scale(0);
+    opacity:0;
+    transition:transform .55s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  .drop.on{ transform:translate(-50%,-50%) rotate(-45deg) scale(1); opacity:1; }
+  .drop.fall{ transform:translate(-50%,-50%) rotate(-45deg) scale(0); opacity:0; transition:transform .5s cubic-bezier(.6,0,1,.4), opacity .35s ease .15s; }
+  .loader-hint{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.25);
+    font-family:-apple-system,sans-serif;
+    font-size:clamp(15px,3vw,19px); letter-spacing:0.14em; color:var(--paper);
+    opacity:0;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    transition:opacity .5s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .loader-hint.on{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .loader-hint .chev{
+    width:12px; height:12px;
+    border-right:1.5px solid #D9A63E; border-bottom:1.5px solid #D9A63E;
+    transform:rotate(45deg);
+    animation:nudge 1.4s ease-in-out infinite;
+  }
+  @keyframes nudge{
+    0%,100%{ transform:rotate(45deg) translate(0,0); opacity:.6; }
+    50%{ transform:rotate(45deg) translate(3px,3px); opacity:1; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .loader-handle .lt{ animation:none; }
+    .loader-hint .chev{ animation:none; }
+  }
+
+  @media (max-width:760px){
+    .panel-inner{ padding:calc(9vh + var(--safe-top)) 6vw calc(9vh + var(--safe-bottom)); }
+    .idx{ top:calc(6vh + var(--safe-top)); }
+    .wheel-row{ flex-direction:column; text-align:center; gap:20px; }
+    .wheel-viewport{
+      width:100%; max-width:280px; height:140px; overflow:hidden;
+      transform:translateY(-30px);
+    }
+    .wheel-viewport.in{ transform:translateY(0); }
+    .wheel-disc{ left:50%; top:-140px; width:280px; height:280px; margin-left:-140px; }
+    .wheel-node{ width:60px; height:60px; margin:-30px; }
+    .wheel-node:nth-child(1){ transform:rotate(0deg) translate(96px) rotate(0deg); }
+    .wheel-node:nth-child(2){ transform:rotate(120deg) translate(96px) rotate(-120deg); }
+    .wheel-node:nth-child(3){ transform:rotate(240deg) translate(96px) rotate(-240deg); }
+    .wheel-text p{ max-width:none; }
+    .panel[data-key="hero"] .panel-inner{ padding-bottom:calc(14vh + var(--safe-bottom)); }
+    .dive-word{ white-space:normal; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .bg, .content > *, .dive-word, .white-flash{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="loader-stage">
+    <div class="loader-word" id="loaderWord">
+      <span class="tg-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="28" height="28">
+          <circle cx="24" cy="24" r="22.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M13 24.3L35 14l-5 22-7.2-6-3.8 4-1-6.7z" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="loader-handle" id="loaderHandle"></span>
+    </div>
+    <div class="drop" id="loaderDrop"></div>
+    <div class="loader-hint" id="loaderHint"><span>ПРАГАРТУЙЦЕ ЎНІЗ</span><span class="chev"></span></div>
+  </div>
+</div>
+
+<div class="rail"><div class="rail-fill" id="railFill"></div></div>
+<div class="white-flash" id="whiteFlash"></div>
+<div id="spacer"></div>
+
+<section class="panel" data-key="hero" data-length="120">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranavichy01.jpg?width=1600')"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="up">
+      <div class="display">БАРАНА<span>ВІЧЫ</span></div>
+      <p class="sub">Горад, які нарадзіла чыгунка. Прыпынак, што стаў сталіцай Палесся і Наваградчыны — на скрыжаванні дарог, эпох і людзей.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s1" data-length="150">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi_Brestska_street_184.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="left">
+      <span class="kicker">ГІСТОРЫЯ</span>
+      <h2>Ад маёнтка да чыгуначнага вузла</h2>
+      <p>Першыя згадкі пра паселішча на месцы Баранавічаў адносяцца да XVII стагоддзя. Але сапраўдны рост горада пачаўся ў 1870-я гады, калі праз гэтыя землі правялі Маскоўска-Брэсцкую і Пецярбургска-Ровенскую чыгункі. Дзве магістралі перакрыжаваліся тут — і невялікі пасёлак пры станцыі ператварыўся ў адзін з найважнейшых транспартных вузлоў заходняй часткі імперыі.</p>
+      <div class="meta-row">
+        <div><span class="num">1871</span><span class="lbl">прыход чыгункі</span></div>
+        <div><span class="num">2</span><span class="lbl">магістралі на скрыжаванні</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s2" data-length="140">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi_19.04.2021_Brest_Region_Belarus.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="right">
+      <span class="kicker">ХХ СТАГОДДЗЕ</span>
+      <h2>Стаўка, вайна, аднаўленне</h2>
+      <p>У Першую сусветную вайну менавіта тут, на чыгуначным вузле, размяшчалася Стаўка Вярхоўнага галоўнакамандуючага рускай арміі — горад некалькі разоў наведваў імператар Мікалай II. Другая сусветная вайна прынесла Баранавічам разбурэнні: акупацыя, знішчаныя прадпрыемствы і кварталы. Пасляваеннае аднаўленне зноў зрабіла горад прамысловым цэнтрам рэгіёна.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="dive" data-length="130">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Train%20Station%20Baranavichy%20Central.jpg?width=1600')"></div>
+  <div class="dive-inner">
+    <div class="dive-word">СКРЫЖАВАННЕ</div>
+  </div>
+</section>
+
+<section class="panel" data-key="s3" data-length="170">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi_Street_April_2022.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="scale" style="max-width:1100px;">
+      <span class="kicker">СЛАВУТАСЦІ</span>
+      <h2>Тры пункты на карце горада</h2>
+      <p>Асновы гарадскога аблічча — храмы, музеі і вуліцы, якія памятаюць розныя эпохі.</p>
+      <div class="wheel-row">
+        <div class="wheel-viewport" id="wheelViewport">
+          <div class="wheel-disc" id="wheelDisc">
+            <div class="wheel-node active" data-idx="0">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi%2C%20Belarus%20-%20panoramio%20%2811%29.jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-node" data-idx="1">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2021.12.06%20Baranavi%C4%8Dy%20steam%20locomotive.jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-node" data-idx="2">
+              <div class="wheel-node-spin"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Baranavi%C4%8Dy%20Montage%20%282017%29.jpg?width=300" alt=""></div>
+            </div>
+            <div class="wheel-hub"></div>
+          </div>
+        </div>
+        <div class="wheel-text" id="wheelText">
+          <h3 id="wheelTitle">Свята-Пакроўскі сабор</h3>
+          <p id="wheelDesc">Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="s4" data-length="140">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranovichi01.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="left">
+      <span class="kicker">СУЧАСНАСЦЬ</span>
+      <h2>Прамысловы і культурны цэнтр Брэстчыны</h2>
+      <p>Сёння Баранавічы — адзін з найбуйнейшых гарадоў Беларусі, дзе дзейнічаюць прадпрыемствы лёгкай і харчовай прамысловасці, дзяржаўны ўніверсітэт, драматычны тэатр і музей выяўленчага мастацтва. Горад захоўвае сваю галоўную рысу — быць месцам сустрэчы дарог і людзей.</p>
+      <div class="meta-row">
+        <div><span class="num">10</span><span class="lbl">у ліку найбуйнейшых гарадоў РБ</span></div>
+        <div><span class="num">140 км</span><span class="lbl">да Мінска</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-key="footer" data-length="130">
+  <div class="bg" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Baranavichy01.jpg?width=1600')"></div>
+  <div class="idx"></div>
+  <div class="panel-inner">
+    <div class="content" data-variant="up">
+      <span class="kicker">ЗАКЛЮЧЭННЕ</span>
+      <h2>Горад, які варта пабачыць</h2>
+      <p>Баранавічы — гэта гісторыя пра тое, як чыгунка можа стварыць горад, а горад — захаваць памяць пра ўсе дарогі, што праз яго прайшлі. Дзякуй за ўвагу.</p>
+      <div class="foot-meta">
+        <span>Спасибо большое за терпение</span>
+        <span>Egor daun</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // ---- loading screen: floating handle -> drop -> hint, then reveal ----
+  var handle = '@katersonmy';
+  var handleEl = document.getElementById('loaderHandle');
+  handleEl.innerHTML = handle.split('').map(function(ch, i){
+    return '<span class="lt" style="animation-delay:' + (i * 0.07) + 's">' + ch + '</span>';
+  }).join('');
+
+  document.documentElement.style.overflow = 'hidden';
+
+  var loaderWord = document.getElementById('loaderWord');
+  var loaderDrop = document.getElementById('loaderDrop');
+  var loaderHint = document.getElementById('loaderHint');
+  var loader = document.getElementById('loader');
+  var reducedMotionLoader = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var t1 = reducedMotionLoader ? 100 : 200;   // word appears
+  var t2 = reducedMotionLoader ? 700 : 2100;  // word morphs into drop
+  var t3 = reducedMotionLoader ? 1100 : 2650; // drop falls, hint appears
+  var t4 = reducedMotionLoader ? 1600 : 3700; // loader fades out
+
+  setTimeout(function(){ loaderWord.classList.add('on'); }, t1);
+  setTimeout(function(){
+    loaderDrop.classList.add('on');
+    loaderWord.classList.add('off');
+  }, t2);
+  setTimeout(function(){
+    loaderDrop.classList.add('fall');
+    loaderHint.classList.add('on');
+  }, t3);
+  setTimeout(function(){
+    loader.classList.add('hide');
+    document.documentElement.style.overflow = '';
+  }, t4);
+  setTimeout(function(){ loader.style.display = 'none'; }, t4 + 650);
+
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var total = panels.length;
+  var infoPanels = panels.filter(function(p){ return p.dataset.key !== 'dive'; });
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var railFill = document.getElementById('railFill');
+  var whiteFlash = document.getElementById('whiteFlash');
+
+  var boundaries = [];
+  var spacerHeightPx = 0;
+
+  infoPanels.forEach(function(p, i){
+    var idxEl = p.querySelector('.idx');
+    if(idxEl){ idxEl.textContent = pad(i+1) + ' / ' + pad(infoPanels.length); }
+  });
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+
+  function layout(){
+    var vh = window.innerHeight;
+    var acc = 0;
+    boundaries = panels.map(function(p){
+      var len = parseFloat(p.dataset.length) / 100 * vh;
+      var b = { start: acc, end: acc + len, len: len };
+      acc += len;
+      return b;
+    });
+    spacerHeightPx = acc;
+    document.getElementById('spacer').style.height = spacerHeightPx + 'px';
+  }
+
+  function smoothstep(e0, e1, x){
+    if(e0 === e1) return x < e0 ? 0 : 1;
+    var t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+    return t * t * (3 - 2 * t);
+  }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+
+  var sightsData = [
+    { title:'Свята-Пакроўскі сабор', desc:'Пабудаваны ў 1924–1931 гг., адна з галоўных архітэктурных дамінант горада і цэнтр праваслаўнага прыхода.' },
+    { title:'Чыгуначная спадчына', desc:'Помнік-паравоз і музейныя экспазіцыі нагадваюць, з чаго пачаўся горад — са станцыі і рэек.' },
+    { title:'Цэнтральныя вуліцы', desc:'Забудова розных эпох — ад міжваеннай да сучаснай — суіснуе на галоўных праспектах горада.' }
+  ];
+  var wheelViewport = document.getElementById('wheelViewport');
+  var wheelDisc = document.getElementById('wheelDisc');
+  var wheelNodes = wheelDisc ? Array.prototype.slice.call(wheelDisc.querySelectorAll('.wheel-node')) : [];
+  var wheelNodeSpins = wheelDisc ? Array.prototype.slice.call(wheelDisc.querySelectorAll('.wheel-node-spin')) : [];
+  var wheelTitleEl = document.getElementById('wheelTitle');
+  var wheelDescEl = document.getElementById('wheelDesc');
+  var wheelTextEl = document.getElementById('wheelText');
+  var wheelIdx = 0;
+
+  function setWheelIdx(i){
+    wheelIdx = i;
+    wheelNodes.forEach(function(n){ n.classList.toggle('active', +n.dataset.idx === i); });
+    if(!wheelTextEl) return;
+    wheelTextEl.classList.add('fade');
+    setTimeout(function(){
+      wheelTitleEl.textContent = sightsData[i].title;
+      wheelDescEl.textContent = sightsData[i].desc;
+      wheelTextEl.classList.remove('fade');
+    }, 220);
+  }
+
+  var VARIANTS = {
+    up:    { axis:'y', dist:30 },
+    left:  { axis:'x', dist:-56 },
+    right: { axis:'x', dist:56 },
+    scale: { axis:'scale', dist:0 }
+  };
+
+  function update(){
+    var scrollY = window.scrollY || window.pageYOffset;
+    var vh = window.innerHeight;
+    var maxScroll = Math.max(1, spacerHeightPx - vh);
+    var overall = Math.min(1, Math.max(0, scrollY / maxScroll));
+    railFill.style.width = (overall * 100) + '%';
+
+    var flashOpacity = 0;
+
+    panels.forEach(function(p, i){
+      var b = boundaries[i];
+      var local = (scrollY - b.start) / b.len;
+      var clamped = Math.min(1.15, Math.max(-0.15, local));
+
+      var isFirst = i === 0;
+      var isLast = i === total - 1;
+      var entryEnd = isFirst ? 0 : 0.22;
+      var holdEnd = isLast ? 1.0 : 0.74;
+
+      var fadeIn = isFirst ? 1 : smoothstep(0, entryEnd, clamped);
+      var fadeOut = isLast ? 0 : smoothstep(holdEnd, 1, clamped);
+      var opacity = Math.max(0, fadeIn - fadeOut);
+      if(clamped <= -0.02 || clamped >= 1.02){ opacity = 0; }
+
+      p.style.opacity = opacity;
+      p.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
+
+      if(p.dataset.key === 's3' && wheelViewport){
+        if(opacity > 0.35){ wheelViewport.classList.add('in'); } else { wheelViewport.classList.remove('in'); }
+        if(wheelDisc){
+          var wheelClamped = Math.min(1, Math.max(0, clamped));
+          var rotDeg = reduced ? 0 : wheelClamped * 720;
+          wheelDisc.style.transform = 'rotate(' + rotDeg.toFixed(1) + 'deg)';
+          wheelNodeSpins.forEach(function(el){ el.style.transform = 'rotate(' + (-rotDeg).toFixed(1) + 'deg)'; });
+          var activeIdx = Math.floor((((rotDeg % 360) + 360) % 360) / 120);
+          if(activeIdx !== wheelIdx){ setWheelIdx(activeIdx); }
+        }
+      }
+
+      if(p.dataset.key === 'dive'){
+        var word = p.querySelector('.dive-word');
+        var diveBg = p.querySelector('.bg');
+        if(reduced){
+          word.style.transform = 'none'; word.style.opacity = 1;
+          if(diveBg) diveBg.style.transform = 'none';
+        } else {
+          var wScale = lerp(0.65, 7.5, smoothstep(0, 0.85, local));
+          word.style.transform = 'scale(' + wScale.toFixed(2) + ')';
+          word.style.opacity = 1 - smoothstep(0.55, 0.85, local);
+          if(diveBg){
+            var diveBgScale = lerp(1.0, 1.6, smoothstep(0, 1, clamped));
+            diveBg.style.transform = 'scale(' + diveBgScale.toFixed(3) + ')';
+          }
+          flashOpacity = Math.max(flashOpacity,
+            Math.max(0, smoothstep(0.55, 0.82, local) - smoothstep(1.0, 1.35, local)));
+        }
+        return;
+      }
+
+      var bg = p.querySelector('.bg');
+
+      if(reduced){
+        if(bg) bg.style.transform = 'none';
+      } else {
+        var zoomIn = i % 2 === 0;
+        var bgScale;
+        if(zoomIn){
+          bgScale = lerp(1.0, 1.18, smoothstep(0, 1, clamped));
+        } else {
+          bgScale = lerp(1.22, 1.02, smoothstep(0, 0.6, clamped));
+          bgScale = lerp(bgScale, bgScale + 0.06, smoothstep(0.6, 1, clamped));
+        }
+        var bgShiftX = (i % 2 === 0 ? 1 : -1) * lerp(0, 14, smoothstep(0, 1, clamped));
+        if(bg){ bg.style.transform = 'scale(' + bgScale.toFixed(3) + ') translateX(' + bgShiftX.toFixed(1) + 'px)'; }
+      }
+
+      var contentEl = p.querySelector('.content');
+      if(!contentEl) return;
+      var variant = VARIANTS[contentEl.dataset.variant] || VARIANTS.up;
+      var blocks = Array.prototype.slice.call(contentEl.children);
+
+      blocks.forEach(function(el, j){
+        var delay = j * 0.06;
+        var eT = smoothstep(delay, delay + 0.24, clamped);
+        var xT = isLast ? 0 : smoothstep(holdEnd, 1, clamped);
+        var bOpacity = reduced ? 1 : Math.max(0, eT - xT);
+        el.style.opacity = bOpacity;
+
+        if(reduced){ el.style.transform = 'none'; return; }
+
+        var exitY = -20 * xT;
+        var t;
+        if(variant.axis === 'x'){
+          t = 'translateX(' + (variant.dist * (1 - eT)).toFixed(1) + 'px) translateY(' + exitY.toFixed(1) + 'px)';
+        } else if(variant.axis === 'scale'){
+          var sc = lerp(0.86, 1, eT) - xT * 0.05;
+          t = 'scale(' + sc.toFixed(3) + ') translateY(' + exitY.toFixed(1) + 'px)';
+        } else {
+          t = 'translateY(' + (variant.dist * (1 - eT) + exitY).toFixed(1) + 'px)';
+        }
+        el.style.transform = t;
+      });
+    });
+
+    whiteFlash.style.opacity = Math.min(1, flashOpacity);
+  }
+
+  var ticking = false;
+  function onScroll(){
+    if(!ticking){
+      requestAnimationFrame(function(){ update(); ticking = false; });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', function(){ layout(); update(); });
+  window.addEventListener('orientationchange', function(){ layout(); update(); });
+
+  layout();
+  update();
+})();
+</script>
+
+</body>
+</html>
