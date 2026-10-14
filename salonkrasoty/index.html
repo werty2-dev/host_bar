@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2323857E%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M16%206c-3%203-3%209%200%2013%203-4%203-10%200-13Z%22/%3E%3Cpath%20d%3D%22M16%2019c-1-5-5-8-10-8%200%205%204%209%2010%208Z%22/%3E%3Cpath%20d%3D%22M16%2019c1-5%205-8%2010-8%200%205-4%209-10%208Z%22/%3E%3C/g%3E%3C/svg%3E">
 <meta name="theme-color" content="#23857E">
-<title>Нимфея | студия красоты</title>
+<title>Нимфея, студия красоты</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -386,7 +386,7 @@ footer{border-top:1px solid var(--line);padding-block:30px 40px;color:var(--mute
             <div class="field"><label for="tel">Телефон</label><input id="tel" type="tel" autocomplete="tel" inputmode="numeric" maxlength="19" placeholder="+375 (29) 000-00-00"></div>
           </div>
           <div class="err" id="err" role="alert"></div>
-          <button class="btn" type="submit" style="width:100%">Записаться</button>
+          <button class="btn" type="button" id="send" style="width:100%">Записаться</button>
         </form>
         <div class="done" id="done" aria-live="polite">
           <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg></div>
@@ -458,6 +458,7 @@ footer{border-top:1px solid var(--line);padding-block:30px 40px;color:var(--mute
     var b=document.createElement('button');b.className='tab';b.type='button';b.setAttribute('role','tab');b.textContent=n;b.setAttribute('aria-selected',i===0);
     b.addEventListener('click',function(){cur=i;renderTab()});tabs.appendChild(b);
   });
+  function placeInk(){var b=tabs.querySelectorAll('.tab')[cur];if(b){ink.style.left=b.offsetLeft+'px';ink.style.width=b.offsetWidth+'px'}}
   function renderTab(){
     var bs=tabs.querySelectorAll('.tab');
     bs.forEach(function(b,i){b.setAttribute('aria-selected',i===cur)});
@@ -469,8 +470,8 @@ footer{border-top:1px solid var(--line);padding-block:30px 40px;color:var(--mute
       li.querySelector('h3').textContent=r[0];li.querySelector('p').textContent=r[1];plist.appendChild(li);
     });
   }
-  renderTab();addEventListener('resize',renderTab);
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(renderTab);
+  renderTab();addEventListener('resize',placeInk);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeInk);
 
   /* ---------- запись ---------- */
   var svc=$('#svc'),slots=$('#slots'),dateEl=$('#date'),chosenTime=null;
@@ -539,14 +540,16 @@ footer{border-top:1px solid var(--line);padding-block:30px 40px;color:var(--mute
     var v=tel.value;
     if(e.inputType==='deleteContentBackward'&&v.length<=PFX.length){tel.value=PFX;return}
     var body=v.indexOf(PFX)===0?v.slice(PFX.length):v;
-    var out=fmtTel(v.indexOf(PFX)===0?'375'+body:v);
+    var dg=(v.indexOf(PFX)===0?body:v).replace(/\D/g,'');
+    if(dg.indexOf('375')===0)dg=dg.slice(3);else if(dg.indexOf('80')===0)dg=dg.slice(2);else if(dg.charAt(0)==='0')dg=dg.slice(1);
+    var out=fmtTel('375'+dg);
     if(e.inputType&&e.inputType.indexOf('delete')===0&&/\d/.test(out.slice(PFX.length)))out=out.replace(/[^\d]+$/,'');
     tel.value=out;
   });
   tel.addEventListener('blur',function(){if(tel.value===PFX)tel.value=''});
   var form=$('#form'),done=$('#done'),err=$('#err');
-  form.addEventListener('submit',function(e){
-    e.preventDefault();
+  function sendForm(e){
+    if(e)e.preventDefault();
     var name=$('#name').value.trim(),tel=$('#tel').value.trim(),digits=tel.replace(/\D/g,'');
     if(!chosen.length){err.textContent='Выберите хотя бы одну услугу.';return}
     if(!dateEl.value){err.textContent='Выберите дату.';return}
@@ -557,7 +560,10 @@ footer{border-top:1px solid var(--line);padding-block:30px 40px;color:var(--mute
     var d=new Date(dateEl.value+'T00:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',weekday:'long'});
     $('#sum').textContent=name+', ждём вас: '+chosen.map(function(x){return x.n.toLowerCase()}).join(', ')+', '+d+' в '+chosenTime+'. Администратор позвонит на '+tel+', чтобы подтвердить.';
     form.style.display='none';done.classList.add('show');
-  });
+  }
+  form.addEventListener('submit',sendForm);
+  $('#send').addEventListener('click',function(){sendForm()});
+  [].slice.call(form.querySelectorAll('input')).forEach(function(i){i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendForm()}})});
   $('#again').addEventListener('click',function(){done.classList.remove('show');form.style.display='';form.reset();dateEl.value=iso(tm);buildDays();chosen=[];svc.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed','false')});showTotal();renderSlots()});
 
   /* ---------- лампочки на арке зеркала ---------- */
