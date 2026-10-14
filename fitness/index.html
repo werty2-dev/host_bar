@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%232B5BFF%22/%3E%3Cpath%20d%3D%22M6%2012v8M10%209v14M22%209v14M26%2012v8M10%2016h12%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
 <meta name="theme-color" content="#2B5BFF">
 <meta name="robots" content="noindex, nofollow">
-<title>Атлас | фитнес-клуб</title>
+<title>Атлас, фитнес-клуб</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Onest:wght@400;500;600;700&display=swap">
@@ -49,7 +49,8 @@ p{margin:0}a{color:inherit}
 .scene .bg{position:absolute;left:50%;top:50%;width:max(100%,900px);height:max(100%,720px);object-fit:cover;
   transform:translate3d(-50%,calc(-50% + var(--py,0px)),0) scale(1.1);filter:blur(2px) saturate(.9)}
 .scene .veil{position:absolute;inset:0;background:var(--veil)}
-.sl{position:absolute;width:min(44vw,540px);border-radius:24px;overflow:hidden;opacity:0;will-change:transform,opacity;box-shadow:0 40px 80px -40px rgba(0,0,0,.5)}
+.sl{position:absolute;width:min(44vw,540px);overflow:hidden;opacity:0;will-change:transform,opacity;pointer-events:none;
+  -webkit-mask-image:radial-gradient(ellipse 62% 62% at 50% 50%,#000 38%,transparent 100%);mask-image:radial-gradient(ellipse 62% 62% at 50% 50%,#000 38%,transparent 100%)}
 .sl img{display:block;width:100%;height:auto;filter:saturate(.95)}
 .sl::after{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 38%,transparent)}
 .sl.s1{left:4vw;top:22vh}
@@ -547,17 +548,24 @@ footer .legal{grid-column:1/-1;padding-top:18px;border-top:1px solid var(--line)
   })();
 
   /* шапка, прогресс, фон, проплывающие фото */
-  var hdr=$('#top'),bar=$('#bar'),scene=$('.scene'),sl=$$('.sl'),CEN=[.16,.5,.84];
+  var hdr=$('#top'),bar=$('#bar'),scene=$('.scene'),sl=$$('.sl'),CEN=[.16,.5,.84],slCur=[-9,-9,-9],slTgt=[-9,-9,-9],raf=0;
+  function paint(){
+    var moving=false;
+    sl.forEach(function(el,i){
+      var d=slTgt[i]-slCur[i];if(Math.abs(d)>.0008){slCur[i]+=d*.12;moving=true}else slCur[i]=slTgt[i];
+      var o=slCur[i],a=Math.max(0,1-Math.abs(o));a=a*a*(3-2*a);
+      el.style.opacity=(a*.55).toFixed(3);
+      el.style.transform='translate3d('+(o*(i===1?7:-7)).toFixed(2)+'vw,'+(o*-26).toFixed(2)+'vh,0) rotate('+((i-1)*2.5+o*1.5).toFixed(2)+'deg) scale('+(1+.06*a).toFixed(3)+')';
+    });
+    raf=moving?requestAnimationFrame(paint):0;
+  }
   function onScroll(){
     var h=document.documentElement.scrollHeight-innerHeight,p=h>0?Math.min(1,Math.max(0,scrollY/h)):0;
     bar.style.transform='scaleX('+p+')';hdr.classList.toggle('stuck',scrollY>8);
     if(reduce)return;
     scene.style.setProperty('--py',(-scrollY*.04).toFixed(1)+'px');
-    sl.forEach(function(el,i){
-      var o=(p-CEN[i])/.2,a=Math.max(0,1-Math.abs(o));a=a*a*(3-2*a);
-      el.style.opacity=(a*.78).toFixed(3);
-      el.style.transform='translate3d('+(o*(i===1?14:-14)).toFixed(2)+'vw,'+(o*-46).toFixed(2)+'vh,0) rotate('+((i-1)*3+o*2.5).toFixed(2)+'deg) scale('+(1+.1*a).toFixed(3)+')';
-    });
+    sl.forEach(function(el,i){slTgt[i]=(p-CEN[i])/.26});
+    if(!raf)raf=requestAnimationFrame(paint);
   }
   addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);onScroll();
   if(reduce)sl.forEach(function(el,i){el.style.opacity=i===1?'.5':'0'});
@@ -618,6 +626,7 @@ footer .legal{grid-column:1/-1;padding-top:18px;border-top:1px solid var(--line)
     b.addEventListener('click',function(){cur=i;renderTab()});tabs.appendChild(b);
   });
   function goBook(){document.getElementById('book').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})}
+  function placeInk(){var b=$$('.tab',tabs)[cur];if(b){ink.style.left=b.offsetLeft+'px';ink.style.width=b.offsetWidth+'px'}}
   function renderTab(){
     var bs=$$('.tab',tabs);bs.forEach(function(b,i){b.setAttribute('aria-selected',i===cur)});
     var b=bs[cur];ink.style.left=b.offsetLeft+'px';ink.style.width=b.offsetWidth+'px';
@@ -764,8 +773,8 @@ footer .legal{grid-column:1/-1;padding-top:18px;border-top:1px solid var(--line)
   });
   ticket();show(1);
 
-  function layout(){moveSeg();renderTab()}
-  layout();addEventListener('resize',layout);
+  function layout(){moveSeg();placeInk()}
+  renderTab();layout();addEventListener('resize',layout);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 
   /* ---------- анимация: подъём гантели на бицепс + слова ---------- */
